@@ -85,6 +85,19 @@ export class WorkDay {
     shift.nightFee.add(DurationService.calculateDuration(nightFeeStart, shift.end));
   }
 
+  private calculateOverNightFee(shift:WorkShift):boolean{
+    let startHour = parseInt(shift.start.split(":")[0]);
+    let endHour = parseInt(shift.end.split(":")[0]);
+    if(startHour > endHour){
+      shift.normalFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationStarts));
+      shift.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, "24:00"));
+      shift.nightFee.add(DurationService.calculateDuration("0:00",Settings.eveningCompensationEnds));
+      shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, shift.end));
+      return true;
+    }
+    return false
+  }
+
   public calculateDailyHours() {
     this.workingShifts.sort(
       (a, b) => {
@@ -92,7 +105,6 @@ export class WorkDay {
       });
 
     this.workingShifts.forEach(shift => {
-      /* TODO starting before evening compensation, and ends aftes compensation ends */
       if (this.timeBetween(shift.start, Settings.eveningCompensationStarts, "24:00") ||
         this.timeBetween(shift.start, "0:00", Settings.eveningCompensationEnds)
       ) {
@@ -104,7 +116,9 @@ export class WorkDay {
         this.calculateShiftEnd(shift);
       }
       else {
-        shift.normalFee.add(shift.duration);
+        if(!this.calculateOverNightFee(shift)){
+          shift.normalFee.add(shift.duration);
+        }
       }
     });
   }
