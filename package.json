@@ -1,14 +1,9 @@
 {
-  "name": "angular2-webpack-starter",
-  "version": "5.0.5",
-  "description": "An Angular 2 Webpack Starter kit featuring Angular 2 (Router, Http, Forms, Services, Tests, E2E, Coverage), Karma, Protractor, Jasmine, Istanbul, TypeScript, and Webpack by AngularClass",
-  "keywords": [
-    "angular2",
-    "webpack",
-    "typescript"
-  ],
-  "author": "Patrick Stapleton <patrick@angularclass.com>",
-  "homepage": "https://github.com/angularclass/angular2-webpack-starter",
+  "name": "Testing",
+  "version": "0.0.1",
+  "description": "Wage calculator",
+  "keywords": [],
+  "author": "Pauli Kostamo <pauli.kostamo@helsinki.fi>",
   "license": "MIT",
   "scripts": {
      "rimraf": "rimraf",
@@ -19,7 +14,7 @@
      "webpack-dev-server": "webpack-dev-server",
      "webdriver-manager": "webdriver-manager",
      "protractor": "protractor",
-     
+
      "typings-install": "npm run typings -- install",
 
      "clean": "npm cache clean && npm run rimraf -- node_modules doc typings coverage dist",
@@ -94,7 +89,8 @@
     "rxjs": "5.0.0-beta.6",
     "zone.js": "~0.6.12",
 
-    "http-server": "^0.9.0"
+    "http-server": "^0.9.0",
+    "moment": "^2.13.0"
   },
   "devDependencies": {
 
