@@ -9,7 +9,7 @@ import { BaseRequestOptions, Http } from '@angular/http';
 import { MockBackend } from '@angular/http/testing';
 
 // Load the implementations that should be tested
-import { Wage } from './wage.component';
+import { WagePage } from './wage.component';
 import { Person } from './person';
 import { WorkShift } from './work-shift';
 import { WorkDay } from './workday';
@@ -27,7 +27,7 @@ describe('Wage', () => {
       deps: [MockBackend, BaseRequestOptions]
     },
 
-    Wage,
+    WagePage,
     Person,
     WorkShift,
     WorkDay
