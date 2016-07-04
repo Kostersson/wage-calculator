@@ -8,7 +8,7 @@ import {FileReaderService} from "../../services/file-reader.service";
   directives: [],
   templateUrl: './wage.html'
 })
-export class Wage {
+export class WagePage {
 
   constructor(private readerService:FileReaderService) {
     this.readerService.read();

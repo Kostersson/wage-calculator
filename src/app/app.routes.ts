@@ -1,12 +1,11 @@
-import { WebpackAsyncRoute } from '@angularclass/webpack-toolkit';
 import { RouterConfig } from '@angular/router';
 import { Home } from './pages/home';
-import {Wage} from "./pages/wage";
+import {WagePage} from "./pages/wage";
 
-export const routes:RouterConfig = [
+export const routes:RouterConfig = <RouterConfig>[
   {path: '', component: Home},
   {path: 'home', component: Home},
-  {path: 'wage', component: Wage}
+  {path: 'wage', component: WagePage}
 
 ];
 
