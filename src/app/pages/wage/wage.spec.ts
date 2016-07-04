@@ -215,18 +215,33 @@ describe('Wage', () => {
     expect(workday.getDailyWage()).toEqual(2 * Settings.hourlyWage + 2 * Settings.eveningCompensation);
   });
 
-  it('Workday wage with evening compensation and overtime compensation (14 hours)', () => {
+  it('Workday wage with evening compensation and overtime compensation (16 hours)', () => {
     let workday = new Workday("04.2.2016");
-    let workingShifts = [new WorkShift("6:00", "20:00")];
+    let workingShifts = [new WorkShift("6:00", "22:00")];
     workday.addWorkingShifts(workingShifts);
     workday.calculateDailyAmount();
     expect(workday.getNormalFee()).toEqual(new Duration(12, 0));
-    expect(workday.getEveningFee()).toEqual(new Duration(2, 0));
+    expect(workday.getEveningFee()).toEqual(new Duration(4, 0));
     let dailyWage = 8 * Settings.hourlyWage +
       (2 * Settings.hourlyWage) * Settings.overtimeCompensation[0] +
       (2 * Settings.hourlyWage) * Settings.overtimeCompensation[1] +
-      (2 * Settings.hourlyWage) * Settings.overtimeCompensation[2] +
-      (2 * (Settings.hourlyWage + Settings.eveningCompensation));
+      (4 * Settings.hourlyWage) * Settings.overtimeCompensation[2] +
+      (4 * Settings.eveningCompensation);
+    expect(workday.getDailyWage()).toEqual(dailyWage);
+  });
+
+  it('Workday 5:30-18:30 (13 hours)', () => {
+    let workday = new Workday("04.2.2016");
+    let workingShifts = [new WorkShift("5:30", "18:30")];
+    workday.addWorkingShifts(workingShifts);
+    workday.calculateDailyAmount();
+    expect(workday.getNormalFee()).toEqual(new Duration(12, 0));
+    expect(workday.getEveningFee()).toEqual(new Duration(1, 0));
+    let dailyWage = 8 * Settings.hourlyWage +
+      (2 * Settings.hourlyWage) * Settings.overtimeCompensation[0] +
+      (2 * Settings.hourlyWage) * Settings.overtimeCompensation[1] +
+      Settings.hourlyWage * Settings.overtimeCompensation[2] +
+      Settings.eveningCompensation;
     expect(workday.getDailyWage()).toEqual(dailyWage);
   });
 });

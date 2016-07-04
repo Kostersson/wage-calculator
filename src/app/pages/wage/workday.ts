@@ -71,20 +71,13 @@ export class Workday {
   }
 
   private calculateOvertimeWage(hours:number, minutes:number):number {
-    let temp: number;
     if (hours < 2 || (hours == 2 && minutes == 0)) {
-      temp = (hours * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[0];
-      console.log(temp);
-      return temp;
+      return (hours * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[0];
     }
     else if (hours < 4 || (hours==4 && minutes==0)) {
-      temp = this.calculateOvertimeWage(2, 0) + ((hours - 2) * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[1];
-      console.log(temp);
-      return temp;
+      return this.calculateOvertimeWage(2, 0) + ((hours - 2) * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[1];
     }
-    temp = this.calculateOvertimeWage(4, 0) + ((hours - 4) * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[2];
-    console.log(temp);
-    return temp;
+    return this.calculateOvertimeWage(4, 0) + ((hours - 4) * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[2];
   }
 
 
