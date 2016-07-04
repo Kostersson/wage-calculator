@@ -1,5 +1,4 @@
 import {DurationService} from "../../services/duration.service";
-import {Inject} from '@angular/core';
 import {Duration} from "../../services/duration";
 
 export class WorkShift {

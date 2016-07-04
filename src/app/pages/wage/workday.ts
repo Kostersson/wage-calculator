@@ -4,39 +4,120 @@ import {DurationService} from "../../services/duration.service";
 import * as moment from 'moment';
 import {Settings} from "../../resources/settings";
 
-export class WorkDay {
+export class Workday {
   private workingShifts:WorkShift[];
+
+  private normalFee:Duration;
+  private eveningFee:Duration;
+  private wage:number;
 
   constructor(public day:string) {
     this.workingShifts = [];
+    this.normalFee = new Duration(0, 0);
+    this.eveningFee = new Duration(0, 0);
   }
 
   public getWorkingShifts():WorkShift[] {
     return this.workingShifts;
   }
 
+  public getNormalFee():Duration {
+    return this.normalFee;
+  }
+
+  public getEveningFee():Duration {
+    return this.eveningFee;
+  }
+
+  public getDailyWage():number {
+    return this.wage;
+  }
+
   public addWorkingShifts(workingShifts:WorkShift[]):void {
     this.workingShifts = this.workingShifts.concat(workingShifts);
   }
 
-  public calculateDailyAmount():string {
+  public calculateDailyAmount() {
     this.calculateDailyHours();
+    this.calculateTotalWorkingHours();
 
-    let hours:number = 0;
-    let minutes:number = 0;
-    let normalFee = new Duration(0, 0);
-    let eveningFee = new Duration(0, 0);
+    let minutes = (this.normalFee.minutes + this.eveningFee.minutes) % 60;
+    let hours = this.normalFee.hours + this.eveningFee.hours + Math.floor((this.normalFee.minutes + this.eveningFee.minutes) / 60);
+
+    if (hours < 8) {
+      this.wage = this.calculateRegularWage(hours, minutes);
+    }
+    else if (hours == 8) {
+      this.wage = this.calculateRegularWage(hours, 0);
+      if (minutes > 0) {
+        this.wage += this.calculateOvertimeWage(0, minutes);
+      }
+    }
+    else {
+      this.wage = this.calculateRegularWage(8, 0);
+      this.wage += this.calculateOvertimeWage((hours - 8), minutes);
+    }
+    this.wage += this.calculateEveningWage();
+
+
+  }
+
+  private calculateEveningWage():number {
+    return this.eveningFee.hours * Settings.eveningCompensation + this.eveningFee.minutes * (Settings.eveningCompensation / 60)
+  }
+
+  private calculateRegularWage(hours:number, minutes:number):number {
+    return hours * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60);
+  }
+
+  private calculateOvertimeWage(hours:number, minutes:number):number {
+    let temp: number;
+    if (hours < 2 || (hours == 2 && minutes == 0)) {
+      temp = (hours * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[0];
+      console.log(temp);
+      return temp;
+    }
+    else if (hours < 4 || (hours==4 && minutes==0)) {
+      temp = this.calculateOvertimeWage(2, 0) + ((hours - 2) * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[1];
+      console.log(temp);
+      return temp;
+    }
+    temp = this.calculateOvertimeWage(4, 0) + ((hours - 4) * Settings.hourlyWage + minutes * (Settings.hourlyWage / 60)) * Settings.overtimeCompensation[2];
+    console.log(temp);
+    return temp;
+  }
+
+
+  private calculateTotalWorkingHours() {
+    this.workingShifts.forEach(shift => {
+      this.normalFee.add(shift.normalFee);
+      this.eveningFee.add(shift.nightFee);
+    });
+  }
+
+  private calculateDailyHours() {
+    this.workingShifts.sort(
+      (a, b) => {
+        return parseInt(a.start.split(":")[0]) - parseInt(b.start.split(":")[0]);
+      });
 
     this.workingShifts.forEach(shift => {
-      hours += shift.duration.hours;
-      minutes += shift.duration.minutes;
-      normalFee.add(shift.normalFee);
-      eveningFee.add(shift.nightFee);
+      if (this.timeBetween(shift.start, Settings.eveningCompensationStarts, "24:00") ||
+        this.timeBetween(shift.start, "0:00", Settings.eveningCompensationEnds)
+      ) {
+        this.calculateShiftStart(shift);
+      }
+      else if (this.timeBetween(shift.end, Settings.eveningCompensationStarts, "24:00") ||
+        this.timeBetween(shift.end, "0:00", Settings.eveningCompensationEnds)
+      ) {
+        this.calculateShiftEnd(shift);
+      }
+      else {
+        if (!this.calculateOverNightFee(shift)) {
+          shift.normalFee.add(shift.duration);
+        }
+      }
     });
-    hours += Math.floor(minutes / 60);
-    minutes = minutes % 60;
-
-    return hours + ":" + minutes + " normal fee: " + normalFee.toString() + " evening fee: " + eveningFee.toString();
   }
 
   private calculateShiftStart(shift:WorkShift) {
@@ -48,9 +129,9 @@ export class WorkDay {
         moment(shift.end, "H:mm").isBefore(moment("24:00", "H:mm"))
       ) {
         // if shift starts in the morning, and ends late in the evening
-        if(moment(shift.start, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) &&
-            moment(shift.end, "H:mm").isAfter(moment(Settings.eveningCompensationEnds, "H:mm"))
-        ){
+        if (moment(shift.start, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) &&
+          moment(shift.end, "H:mm").isAfter(moment(Settings.eveningCompensationEnds, "H:mm"))
+        ) {
           shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, Settings.eveningCompensationStarts));
           shift.nightFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationEnds));
           shift.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, shift.end));
@@ -75,7 +156,7 @@ export class WorkDay {
     let startHour = parseInt(shift.start.split(":")[0]);
     let nightFeeStartHour = parseInt(Settings.eveningCompensationStarts.split(":")[0]);
     let nightFeeEndHour = parseInt(Settings.eveningCompensationEnds.split(":")[0]);
-    if (startHour < nightFeeStartHour && startHour > nightFeeEndHour) {
+    if (startHour < nightFeeStartHour && startHour >= nightFeeEndHour) {
       shift.normalFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationStarts));
       nightFeeStart = Settings.eveningCompensationStarts;
     }
@@ -85,51 +166,29 @@ export class WorkDay {
     shift.nightFee.add(DurationService.calculateDuration(nightFeeStart, shift.end));
   }
 
-  private calculateOverNightFee(shift:WorkShift):boolean{
+  private calculateOverNightFee(shift:WorkShift):boolean {
     let startHour = parseInt(shift.start.split(":")[0]);
     let endHour = parseInt(shift.end.split(":")[0]);
-    if(startHour > endHour){
+    if (startHour > endHour) {
       shift.normalFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationStarts));
       shift.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, "24:00"));
-      shift.nightFee.add(DurationService.calculateDuration("0:00",Settings.eveningCompensationEnds));
+      shift.nightFee.add(DurationService.calculateDuration("0:00", Settings.eveningCompensationEnds));
       shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, shift.end));
       return true;
     }
     return false
   }
 
-  public calculateDailyHours() {
-    this.workingShifts.sort(
-      (a, b) => {
-        return parseInt(a.start.split(":")[0]) - parseInt(b.start.split(":")[0]);
-      });
-
-    this.workingShifts.forEach(shift => {
-      if (this.timeBetween(shift.start, Settings.eveningCompensationStarts, "24:00") ||
-        this.timeBetween(shift.start, "0:00", Settings.eveningCompensationEnds)
-      ) {
-        this.calculateShiftStart(shift);
-      }
-      else if (this.timeBetween(shift.end, Settings.eveningCompensationStarts, "24:00") ||
-        this.timeBetween(shift.end, "0:00", Settings.eveningCompensationEnds)
-      ) {
-        this.calculateShiftEnd(shift);
-      }
-      else {
-        if(!this.calculateOverNightFee(shift)){
-          shift.normalFee.add(shift.duration);
-        }
-      }
-    });
-  }
-
-
   private timeBetween(time:string, start:string, stop:string):boolean {
     return moment(time, "H:mm").isBetween(moment(start, "H:mm"), moment(stop, "H:mm"));
   }
 
+
   public toString() {
-    let shifts:string = this.day + " " + this.calculateDailyAmount() + "\n";
+    this.calculateDailyAmount();
+    let minutes = (this.normalFee.minutes + this.eveningFee.minutes) % 60;
+    let hours = this.normalFee.hours + this.eveningFee.hours + Math.floor((this.normalFee.minutes + this.eveningFee.minutes) / 60);
+    let shifts:string = this.day + " " + hours + ":" + minutes + " normal fee: " + this.normalFee.toString() + " evening fee: " + this.eveningFee.toString() + "\n";
     this.workingShifts.forEach(shift => shifts += "\t" + shift.toString() + "\n");
     return shifts;
   }

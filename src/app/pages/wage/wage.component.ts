@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {FileReaderService} from "../../services/file-reader.service";
+import {FileReaderService} from '../../services/file-reader.service';
 
 @Component({
   selector: 'wage',

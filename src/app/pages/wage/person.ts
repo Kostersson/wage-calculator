@@ -1,17 +1,17 @@
-import {WorkDay} from "./workday";
+import {Workday} from './workday';
 export class Person {
-  private workdays:Map<string,WorkDay>;
+  private workdays:Map<string,Workday>;
 
   constructor(public id:number,
               public name:string) {
-    this.workdays = new Map<string,WorkDay>();
+    this.workdays = new Map<string,Workday>();
   }
 
   public getWorkdays():Iterator<any> {
     return this.workdays.values();
   }
 
-  public addWorkday(day:WorkDay):void {
+  public addWorkday(day:Workday):void {
     if (!this.workdays.has(day.day)) {
       this.workdays.set(day.day, day);
     }
