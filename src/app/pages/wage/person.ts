@@ -7,8 +7,8 @@ export class Person {
     this.workdays = new Map<string,Workday>();
   }
 
-  public getWorkdays():Iterator<any> {
-    return this.workdays.values();
+  public getWorkdays():Map<string, Workday> {
+    return this.workdays;
   }
 
   public addWorkday(day:Workday):void {

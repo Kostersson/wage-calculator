@@ -1,9 +1,11 @@
 import {Injectable} from '@angular/core';
-import {Http} from '@angular/http';
+import {Http, Response} from '@angular/http';
 import {Person} from '../pages/wage/person';
 import {Workday} from '../pages/wage/workday';
 import {WorkShift} from '../pages/wage/work-shift';
 import {Settings} from '../resources/settings';
+import {Observable} from "rxjs/Rx";
+import 'rxjs/add/operator/map'
 
 @Injectable()
 export class FileReaderService {
@@ -13,15 +15,17 @@ export class FileReaderService {
     this.persons = new Map<number, Person>();
   }
 
-  public read() {
-    this.http.get(Settings.hourListUrl).subscribe(
+  public read():Observable<Response> {
+    return this.http.get(Settings.hourListUrl).do(
       (result) => {
         let array = result.text().split('\n');
         array.reverse().pop();
         array.forEach((line) => this.parseLine(line));
-        this.persons.forEach(person => console.log(person.toString()));
       }
     );
+  }
+  public getPersons(){
+    return this.persons;
   }
 
   private parseLine(line:string) {

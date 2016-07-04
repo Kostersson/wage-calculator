@@ -4,5 +4,5 @@ export class Settings {
   public static overtimeCompensation:number[] = [1.25, 1.5, 2];
   public static eveningCompensationStarts:string = "18:00";
   public static eveningCompensationEnds:string = "6:00";
-  public static hourListUrl:string = "HourList201403.csv";
+  public static hourListUrl:string = "/assets/HourList201403.csv";
 }
