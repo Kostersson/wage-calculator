@@ -27,7 +27,6 @@ export class WagePage {
       },
       () => {
         this.persons = this.readerService.getPersons();
-        this.ngZone.run(()=>{console.log(this.persons)});
       }
     );
 
