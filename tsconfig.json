@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "module": "commonjs",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "moduleResolution": "node"
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "typings/globals/index.d.ts"
   ],
   "awesomeTypescriptLoaderOptions": {
     "forkChecker": true,
-    "useWebpackText": true
+    "useWebpackText": true,
+    "useBabel": true
   },
   "compileOnSave": false,
   "buildOnSave": false,

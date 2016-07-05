@@ -1,7 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, NgZone} from '@angular/core';
 import {FileReaderService} from '../../services/file-reader.service';
 import {Person} from "./person";
-import {MapToIterable} from "../../pipes/map-to-iterable";
+import {MapToIterable} from "../../pipes/map-to-iterable-pipe";
 
 @Component({
   selector: 'wage',
@@ -14,30 +14,28 @@ export class WagePage {
 
   private persons:Map<number, Person>;
 
-  constructor(private readerService:FileReaderService) {
-
+  constructor(private readerService:FileReaderService, private ngZone:NgZone) {
+    this.persons = new Map<number,Person>();
     this.readerService.read().subscribe(
       () => {
-        console.log("foo")
       },
       (err) => {
-        console.log("asdasd");
         console.error(err)
       },
       () => {
-        console.log("done");
-        //this.persons = this.readerService.getPersons();
+        this.persons = this.readerService.getPersons();
+        this.ngZone.run(()=>{console.log(this.persons)});
       }
     );
 
   }
 
-  public getMonthlyWage(personId:number) {
+  public getMonthlyWage(personId:number):number {
     let wage = 0;
     this.persons.get(personId).getWorkdays().forEach((value, key) => {
-      value.calculateDailyAmount();
       wage += value.getDailyWage();
-    })
+    });
+    return wage;
   }
 
 }

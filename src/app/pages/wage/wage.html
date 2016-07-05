@@ -4,5 +4,9 @@
       <th>Name</th>
       <th>Wage</th>
     </tr>
-
+    <tr *ngFor="let person of persons | mapToIterable">
+      <td>{{ person.key }}</td>
+      <td>{{ person.value.name }}</td>
+      <td>{{ getMonthlyWage(person.key) }}</td>
+    </tr>
   </table>

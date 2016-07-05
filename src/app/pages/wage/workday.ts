@@ -13,8 +13,7 @@ export class Workday {
 
   constructor(public day:string) {
     this.workingShifts = [];
-    this.normalFee = new Duration(0, 0);
-    this.eveningFee = new Duration(0, 0);
+    this.resetDurations();
   }
 
   public getWorkingShifts():WorkShift[] {
@@ -35,9 +34,16 @@ export class Workday {
 
   public addWorkingShifts(workingShifts:WorkShift[]):void {
     this.workingShifts = this.workingShifts.concat(workingShifts);
+    this.calculateDailyAmount();
   }
 
-  public calculateDailyAmount() {
+  private resetDurations(){
+    this.normalFee = new Duration(0, 0);
+    this.eveningFee = new Duration(0, 0);
+  }
+
+  private calculateDailyAmount() {
+
     this.calculateDailyHours();
     this.calculateTotalWorkingHours();
 

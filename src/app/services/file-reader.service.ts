@@ -5,7 +5,8 @@ import {Workday} from '../pages/wage/workday';
 import {WorkShift} from '../pages/wage/work-shift';
 import {Settings} from '../resources/settings';
 import {Observable} from "rxjs/Rx";
-import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/do'
+import 'rxjs/Rx';
 
 @Injectable()
 export class FileReaderService {

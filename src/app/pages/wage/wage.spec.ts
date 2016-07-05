@@ -60,7 +60,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("8:00", "10:00"), new WorkShift("11:00", "12:00"), new WorkShift("13:00", "14:45")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(2);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(0);
@@ -87,7 +86,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("18:00", "20:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(0);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(2);
@@ -101,7 +99,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("4:00", "5:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(0);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(1);
@@ -114,7 +111,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("5:00", "10:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(4);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(1);
@@ -127,7 +123,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("16:00", "21:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(2);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(3);
@@ -140,7 +135,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("16:00", "2:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(2);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(8);
@@ -153,7 +147,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("15:00", "8:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getWorkingShifts()[0].normalFee.hours).toEqual(5);
     expect(workday.getWorkingShifts()[0].normalFee.minutes).toEqual(0);
     expect(workday.getWorkingShifts()[0].nightFee.hours).toEqual(12);
@@ -170,7 +163,6 @@ describe('Wage', () => {
     expect(workingShifts[2].duration).toEqual(new Duration(1, 45));
     expect(workingShifts[3].duration).toEqual(new Duration(6, 45));
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
 
     expect(workday.getNormalFee()).toEqual(new Duration(4, 45));
     expect(workday.getEveningFee()).toEqual(new Duration(6, 45));
@@ -182,7 +174,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("8:00", "10:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getDailyWage()).toEqual(2 * Settings.hourlyWage);
 
   });
@@ -191,7 +182,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("6:00", "16:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getNormalFee()).toEqual(new Duration(10, 0));
     expect(workday.getDailyWage()).toEqual(8 * Settings.hourlyWage + (2 * Settings.hourlyWage) * Settings.overtimeCompensation[0]);
   });
@@ -201,7 +191,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("6:00", "18:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getNormalFee()).toEqual(new Duration(12, 0));
     expect(workday.getDailyWage()).toEqual(8 * Settings.hourlyWage + (2 * Settings.hourlyWage) * Settings.overtimeCompensation[0] +
       (2 * Settings.hourlyWage) * Settings.overtimeCompensation[1]);
@@ -211,7 +200,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("18:00", "20:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getDailyWage()).toEqual(2 * Settings.hourlyWage + 2 * Settings.eveningCompensation);
   });
 
@@ -219,7 +207,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("6:00", "22:00")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getNormalFee()).toEqual(new Duration(12, 0));
     expect(workday.getEveningFee()).toEqual(new Duration(4, 0));
     let dailyWage = 8 * Settings.hourlyWage +
@@ -234,7 +221,6 @@ describe('Wage', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("5:30", "18:30")];
     workday.addWorkingShifts(workingShifts);
-    workday.calculateDailyAmount();
     expect(workday.getNormalFee()).toEqual(new Duration(12, 0));
     expect(workday.getEveningFee()).toEqual(new Duration(1, 0));
     let dailyWage = 8 * Settings.hourlyWage +
