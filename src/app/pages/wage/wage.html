@@ -1,12 +1,18 @@
-  <table>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-      <th>Wage</th>
+<div class="well">
+  <h2>Monthly Wages</h2>
+  <select [ngModel]="month" (ngModelChange)="onChange($event)">
+    <option [value]="i" *ngFor="let i of months">{{i}}</option>
+  </select> / 2014
+  <table class="table">
+    <tr class="row">
+      <th class="col-md-3">#</th>
+      <th class="col-md-6">Name</th>
+      <th class="col-md-3">Wage</th>
     </tr>
-    <tr *ngFor="let person of persons | mapToIterable">
-      <td>{{ person.key }}</td>
-      <td>{{ person.value.name }}</td>
-      <td>$ {{ getMonthlyWage(person.key) }}</td>
+    <tr *ngFor="let person of persons | mapToIterable" class="row">
+      <td class="col-md-3">{{ person.key }}</td>
+      <td class="col-md-6">{{ person.value.name }}</td>
+      <td class="col-md-3">$ {{ getMonthlyWage(person.key) }}</td>
     </tr>
   </table>
+</div>

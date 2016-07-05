@@ -1,7 +1,5 @@
 import {WorkShift} from "./work-shift";
 import {Duration} from "../../services/duration";
-import {DurationService} from "../../services/duration.service";
-import * as moment from 'moment';
 import {Settings} from "../../resources/settings";
 
 export class Workday {
@@ -10,9 +8,11 @@ export class Workday {
   private normalFee:Duration;
   private eveningFee:Duration;
   private wage:number;
+  public month:number;
 
   constructor(public day:string) {
     this.workingShifts = [];
+    this.month = parseInt(this.day.split('.')[1]);
     this.resetDurations();
   }
 

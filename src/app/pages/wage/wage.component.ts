@@ -13,9 +13,12 @@ import {MapToIterable} from "../../pipes/map-to-iterable-pipe";
 export class WagePage {
 
   private persons:Map<number, Person>;
+  private month:number;
+  public months = [1,2,3,4,5,6,7,8,9,10,11,12];
 
   constructor(private readerService:FileReaderService, private ngZone:NgZone) {
     this.persons = new Map<number,Person>();
+    this.month = 3;
     this.readerService.read().subscribe(
       () => {
       },
@@ -29,11 +32,16 @@ export class WagePage {
     );
 
   }
+  onChange(month:number) {
+    this.month = month;
+  }
 
   public getMonthlyWage(personId:number):string {
     let wage = 0;
     this.persons.get(personId).getWorkdays().forEach((value, key) => {
-      wage += value.getDailyWage();
+      if(value.month == this.month){
+        wage += value.getDailyWage();
+      }
     });
     return wage.toFixed(2);
   }
