@@ -37,6 +37,6 @@ go to [http://0.0.0.0:3000](http://0.0.0.0:3000) or [http://localhost:3000](http
 # License
  [MIT](/LICENSE)
  
- # Project seed
+# Project seed
  [`AngularClass/angular2-webpack-starter`](github.com/AngularClass/angular2-webpack-starter)
 
