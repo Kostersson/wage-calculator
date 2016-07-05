@@ -5,8 +5,8 @@ import {Settings} from "../../resources/settings";
 export class Workday {
   private workingShifts:WorkShift[];
 
-  private normalFee:Duration;
-  private eveningFee:Duration;
+  private normalHours:Duration;
+  private eveningHours:Duration;
   private wage:number;
   public month:number;
 
@@ -20,12 +20,12 @@ export class Workday {
     return this.workingShifts;
   }
 
-  public getNormalFee():Duration {
-    return this.normalFee;
+  public getNormalHours():Duration {
+    return this.normalHours;
   }
 
-  public getEveningFee():Duration {
-    return this.eveningFee;
+  public getEveningHours():Duration {
+    return this.eveningHours;
   }
 
   public getDailyWage():number {
@@ -38,8 +38,8 @@ export class Workday {
   }
 
   private resetDurations(){
-    this.normalFee = new Duration(0, 0);
-    this.eveningFee = new Duration(0, 0);
+    this.normalHours = new Duration(0, 0);
+    this.eveningHours = new Duration(0, 0);
   }
 
   private calculateDailyAmount() {
@@ -50,8 +50,8 @@ export class Workday {
     this.resetDurations();
     this.calculateTotalWorkingHours();
 
-    let minutes = (this.normalFee.minutes + this.eveningFee.minutes) % 60;
-    let hours = this.normalFee.hours + this.eveningFee.hours + Math.floor((this.normalFee.minutes + this.eveningFee.minutes) / 60);
+    let minutes = (this.normalHours.minutes + this.eveningHours.minutes) % 60;
+    let hours = this.normalHours.hours + this.eveningHours.hours + Math.floor((this.normalHours.minutes + this.eveningHours.minutes) / 60);
 
     if (hours < 8) {
       this.wage = this.calculateRegularWage(hours, minutes);
@@ -72,7 +72,7 @@ export class Workday {
   }
 
   private calculateEveningWage():number {
-    return this.eveningFee.hours * Settings.eveningCompensation + this.eveningFee.minutes * (Settings.eveningCompensation / 60)
+    return this.eveningHours.hours * Settings.eveningCompensation + this.eveningHours.minutes * (Settings.eveningCompensation / 60)
   }
 
   private calculateRegularWage(hours:number, minutes:number):number {
@@ -92,17 +92,17 @@ export class Workday {
 
   private calculateTotalWorkingHours() {
     this.workingShifts.forEach(shift => {
-      this.normalFee.add(shift.normalFee);
-      this.eveningFee.add(shift.nightFee);
+      this.normalHours.add(shift.normalHours);
+      this.eveningHours.add(shift.eveningHours);
     });
   }
 
 
   public toString() {
     this.calculateDailyAmount();
-    let minutes = (this.normalFee.minutes + this.eveningFee.minutes) % 60;
-    let hours = this.normalFee.hours + this.eveningFee.hours + Math.floor((this.normalFee.minutes + this.eveningFee.minutes) / 60);
-    let shifts:string = this.day + " " + hours + ":" + minutes + " normal fee: " + this.normalFee.toString() + " evening fee: " + this.eveningFee.toString() + "\n";
+    let minutes = (this.normalHours.minutes + this.eveningHours.minutes) % 60;
+    let hours = this.normalHours.hours + this.eveningHours.hours + Math.floor((this.normalHours.minutes + this.eveningHours.minutes) / 60);
+    let shifts:string = this.day + " " + hours + ":" + minutes + " normal fee: " + this.normalHours.toString() + " evening fee: " + this.eveningHours.toString() + "\n";
     this.workingShifts.forEach(shift => shifts += "\t" + shift.toString() + "\n");
     return shifts;
   }
