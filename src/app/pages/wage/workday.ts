@@ -43,8 +43,11 @@ export class Workday {
   }
 
   private calculateDailyAmount() {
-
-    this.calculateDailyHours();
+    this.workingShifts.sort(
+      (a, b) => {
+        return parseInt(a.start.split(":")[0]) - parseInt(b.start.split(":")[0]);
+      });
+    this.resetDurations();
     this.calculateTotalWorkingHours();
 
     let minutes = (this.normalFee.minutes + this.eveningFee.minutes) % 60;
@@ -92,94 +95,6 @@ export class Workday {
       this.normalFee.add(shift.normalFee);
       this.eveningFee.add(shift.nightFee);
     });
-  }
-
-  private calculateDailyHours() {
-    this.workingShifts.sort(
-      (a, b) => {
-        return parseInt(a.start.split(":")[0]) - parseInt(b.start.split(":")[0]);
-      });
-
-    this.workingShifts.forEach(shift => {
-      if (this.timeBetween(shift.start, Settings.eveningCompensationStarts, "24:00") ||
-        this.timeBetween(shift.start, "0:00", Settings.eveningCompensationEnds)
-      ) {
-        this.calculateShiftStart(shift);
-      }
-      else if (this.timeBetween(shift.end, Settings.eveningCompensationStarts, "24:00") ||
-        this.timeBetween(shift.end, "0:00", Settings.eveningCompensationEnds)
-      ) {
-        this.calculateShiftEnd(shift);
-      }
-      else {
-        if (!this.calculateOverNightFee(shift)) {
-          shift.normalFee.add(shift.duration);
-        }
-      }
-    });
-  }
-
-  private calculateShiftStart(shift:WorkShift) {
-    let nightFeeEnd:string;
-    if (this.timeBetween(shift.end, Settings.eveningCompensationStarts, "24:00") ||
-      this.timeBetween(shift.end, "0:00", Settings.eveningCompensationEnds)
-    ) {
-      if (moment(shift.end, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) ||
-        moment(shift.end, "H:mm").isBefore(moment("24:00", "H:mm"))
-      ) {
-        // if shift starts in the morning, and ends late in the evening
-        if (moment(shift.start, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) &&
-          moment(shift.end, "H:mm").isAfter(moment(Settings.eveningCompensationEnds, "H:mm"))
-        ) {
-          shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, Settings.eveningCompensationStarts));
-          shift.nightFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationEnds));
-          shift.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, shift.end));
-          return;
-        }
-        nightFeeEnd = shift.end;
-      }
-      else {
-        nightFeeEnd = Settings.eveningCompensationEnds;
-        shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, shift.end));
-      }
-    }
-    else {
-      nightFeeEnd = Settings.eveningCompensationEnds;
-      shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, shift.end));
-    }
-    shift.nightFee.add(DurationService.calculateDuration(shift.start, nightFeeEnd));
-  }
-
-  private calculateShiftEnd(shift:WorkShift) {
-    let nightFeeStart:any;
-    let startHour = parseInt(shift.start.split(":")[0]);
-    let nightFeeStartHour = parseInt(Settings.eveningCompensationStarts.split(":")[0]);
-    let nightFeeEndHour = parseInt(Settings.eveningCompensationEnds.split(":")[0]);
-    if (startHour < nightFeeStartHour && startHour >= nightFeeEndHour) {
-      shift.normalFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationStarts));
-      nightFeeStart = Settings.eveningCompensationStarts;
-    }
-    else {
-      nightFeeStart = shift.start;
-    }
-    shift.nightFee.add(DurationService.calculateDuration(nightFeeStart, shift.end));
-  }
-
-  private calculateOverNightFee(shift:WorkShift):boolean {
-    let startHour = parseInt(shift.start.split(":")[0]);
-    let endHour = parseInt(shift.end.split(":")[0]);
-    if (startHour > endHour) {
-      shift.normalFee.add(DurationService.calculateDuration(shift.start, Settings.eveningCompensationStarts));
-      shift.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, "24:00"));
-      shift.nightFee.add(DurationService.calculateDuration("0:00", Settings.eveningCompensationEnds));
-      shift.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, shift.end));
-      return true;
-    }
-    return false
-  }
-
-  private timeBetween(time:string, start:string, stop:string):boolean {
-    return moment(time, "H:mm").isBetween(moment(start, "H:mm"), moment(stop, "H:mm"));
   }
 
 

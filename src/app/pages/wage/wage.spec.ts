@@ -230,4 +230,24 @@ describe('Wage', () => {
       Settings.eveningCompensation;
     expect(workday.getDailyWage()).toEqual(dailyWage);
   });
+
+  it('Create person with workday', () => {
+    let person = new Person(1, "Jaska Jokunen");
+    let workday = new Workday("04.2.2016");
+    person.addWorkday(workday);
+    expect(person.getWorkdays().get("04.2.2016")).toEqual(workday);
+  });
+
+  it('Merge workdays', () => {
+    let person = new Person(1, "Jaska Jokunen");
+    let workday = new Workday("04.2.2016");
+    let workday2 = new Workday("04.2.2016");
+    workday.addWorkingShifts([new WorkShift("8:00", "10:00")]);
+    workday2.addWorkingShifts([new WorkShift("12:00", "14:00")]);
+    person.addWorkday(workday);
+    person.addWorkday(workday2);
+    expect(person.getWorkdays().get("04.2.2016").getNormalFee()).toEqual(new Duration(4, 0));
+  });
+
+
 });
