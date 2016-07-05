@@ -10,13 +10,13 @@ export class WorkShift {
 
   constructor(public start:string,
               public end:string) {
-    this.normalFee = new Duration(0,0);
-    this.nightFee = new Duration(0,0);
+    this.normalFee = new Duration(0, 0);
+    this.nightFee = new Duration(0, 0);
     this.duration = DurationService.calculateDuration(start, end);
     this.calculateShiftHours();
   }
 
-  private calculateShiftHours(){
+  private calculateShiftHours() {
     if (this.timeBetween(this.start, Settings.eveningCompensationStarts, "24:00") ||
       this.timeBetween(this.start, "0:00", Settings.eveningCompensationEnds)
     ) {
@@ -39,24 +39,16 @@ export class WorkShift {
     if (this.timeBetween(this.end, Settings.eveningCompensationStarts, "24:00") ||
       this.timeBetween(this.end, "0:00", Settings.eveningCompensationEnds)
     ) {
-      if (moment(this.end, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) ||
-        moment(this.end, "H:mm").isBefore(moment("24:00", "H:mm"))
+      // if this starts in the morning, and ends late in the evening
+      if (moment(this.start, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) &&
+        moment(this.end, "H:mm").isAfter(moment(Settings.eveningCompensationEnds, "H:mm"))
       ) {
-        // if this starts in the morning, and ends late in the evening
-        if (moment(this.start, "H:mm").isBefore(moment(Settings.eveningCompensationEnds, "H:mm")) &&
-          moment(this.end, "H:mm").isAfter(moment(Settings.eveningCompensationEnds, "H:mm"))
-        ) {
-          this.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, Settings.eveningCompensationStarts));
-          this.nightFee.add(DurationService.calculateDuration(this.start, Settings.eveningCompensationEnds));
-          this.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, this.end));
-          return;
-        }
-        nightFeeEnd = this.end;
+        this.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, Settings.eveningCompensationStarts));
+        this.nightFee.add(DurationService.calculateDuration(this.start, Settings.eveningCompensationEnds));
+        this.nightFee.add(DurationService.calculateDuration(Settings.eveningCompensationStarts, this.end));
+        return;
       }
-      else {
-        nightFeeEnd = Settings.eveningCompensationEnds;
-        this.normalFee.add(DurationService.calculateDuration(Settings.eveningCompensationEnds, this.end));
-      }
+      nightFeeEnd = this.end;
     }
     else {
       nightFeeEnd = Settings.eveningCompensationEnds;

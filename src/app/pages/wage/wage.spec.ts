@@ -143,6 +143,14 @@ describe('Wage', () => {
     expect(workday.getWorkingShifts()[0].duration.minutes).toEqual(0);
   });
 
+  it('Workday with early morning work, normal work (calculate shifts)', () => {
+    let workday = new Workday("04.2.2016");
+    let workingShifts = [new WorkShift("5:00", "10:00")];
+    workday.addWorkingShifts(workingShifts);
+    expect(workday.getWorkingShifts()[0].normalFee).toEqual(new Duration(4,0));
+    expect(workday.getWorkingShifts()[0].nightFee).toEqual(new Duration(1,0));
+  });
+
   it('Workday with shift that least over night (calculate shifts)', () => {
     let workday = new Workday("04.2.2016");
     let workingShifts = [new WorkShift("15:00", "8:00")];
@@ -176,6 +184,13 @@ describe('Wage', () => {
     workday.addWorkingShifts(workingShifts);
     expect(workday.getDailyWage()).toEqual(2 * Settings.hourlyWage);
 
+  });
+
+  it('Workday with 8 hours and 30 minutes', () => {
+    let workday = new Workday("04.2.2016");
+    let workingShifts = [new WorkShift("8:00", "16:30")];
+    workday.addWorkingShifts(workingShifts);
+    expect(workday.getDailyWage()).toEqual(8 * Settings.hourlyWage + (0.5 * Settings.hourlyWage) * Settings.overtimeCompensation[0]);
   });
 
   it('Workday wage with overtime compensation (10 hours)', () => {

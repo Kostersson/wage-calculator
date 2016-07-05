@@ -30,12 +30,12 @@ export class WagePage {
 
   }
 
-  public getMonthlyWage(personId:number):number {
+  public getMonthlyWage(personId:number):string {
     let wage = 0;
     this.persons.get(personId).getWorkdays().forEach((value, key) => {
       wage += value.getDailyWage();
     });
-    return wage;
+    return wage.toFixed(2);
   }
 
 }
