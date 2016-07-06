@@ -16,6 +16,9 @@ export class WorkShift {
     this.calculateShiftHours();
   }
 
+  /**
+   * Calculates work shifts normal hours and evening hours
+   */
   private calculateShiftHours() {
     if (this.timeBetween(this.start, Settings.eveningCompensationStarts, "24:00") ||
       this.timeBetween(this.start, "0:00", Settings.eveningCompensationEnds)
@@ -34,6 +37,10 @@ export class WorkShift {
     }
   }
 
+  /**
+   * Calculates work shifts normal hours and evening hours,
+   * when shift starts during evening compensation
+   */
   private calculateShiftStart() {
     let eveningHoursEnd:string;
     if (this.timeBetween(this.end, Settings.eveningCompensationStarts, "24:00") ||
@@ -57,6 +64,10 @@ export class WorkShift {
     this.eveningHours.add(DurationService.calculateDuration(this.start, eveningHoursEnd));
   }
 
+  /**
+   * Calculates work shifts normal hours and evening hours,
+   * when shift ends during evening compensation
+   */
   private calculateShiftEnd() {
     let eveningHoursStart:any;
     let startHour = parseInt(this.start.split(":")[0]);
@@ -72,6 +83,10 @@ export class WorkShift {
     this.eveningHours.add(DurationService.calculateDuration(eveningHoursStart, this.end));
   }
 
+  /**
+   * Calculates work shifts normal hours and evening hours,
+   * when shift shift lasts over night
+   */
   private calculateOverNightFee():boolean {
     let startHour = parseInt(this.start.split(":")[0]);
     let endHour = parseInt(this.end.split(":")[0]);
@@ -85,6 +100,12 @@ export class WorkShift {
     return false
   }
 
+  /**
+   * Checks if given time is between two other times
+   * @param {string} time - Time to check (H:MM)
+   * @param {string} start - Start time (H:MM)
+   * @param {string} stop - Stop time (H:MM)
+   */
   private timeBetween(time:string, start:string, stop:string):boolean {
     return moment(time, "H:mm").isBetween(moment(start, "H:mm"), moment(stop, "H:mm"));
   }

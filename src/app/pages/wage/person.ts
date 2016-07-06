@@ -11,12 +11,16 @@ export class Person {
     return this.workdays;
   }
 
+  /**
+   * Adds new workday to persons workdays map
+   * @param {Workday} day
+   */
   public addWorkday(day:Workday):void {
     if (!this.workdays.has(day.day)) {
       this.workdays.set(day.day, day);
     }
     else{
-      this.workdays.get(day.day).addWorkingShifts(day.getWorkingShifts())
+      this.workdays.get(day.day).addWorkShifts(day.getWorkingShifts())
     }
   }
 

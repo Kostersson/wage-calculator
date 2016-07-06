@@ -16,6 +16,10 @@ export class FileReaderService {
     this.persons = new Map<number, Person>();
   }
 
+  /**
+   * Reads hour list url, and deletes first row
+   * @returns {Observable<Response>}
+   */
   public read():Observable<Response> {
     return this.http.get(Settings.hourListUrl).do(
       (result) => {
@@ -25,10 +29,20 @@ export class FileReaderService {
       }
     );
   }
-  public getPersons(){
+
+  /**
+   *
+   * @returns {Map<number, Person>}
+   */
+  public getPersons():Map<number,Person>{
     return this.persons;
   }
 
+  /**
+   * Creates new persons, workdays and work shifts
+   * from CSV
+   * @param {string} line
+     */
   private parseLine(line:string) {
     let lineArr = line.split(',');
     if (lineArr.length < 5) {
@@ -41,7 +55,7 @@ export class FileReaderService {
     }
     const workday = new Workday(lineArr[2]);
     const workingShift = new WorkShift(lineArr[3], lineArr[4]);
-    workday.addWorkingShifts([workingShift]);
+    workday.addWorkShifts([workingShift]);
     this.persons.get(personId).addWorkday(workday);
   }
 }
